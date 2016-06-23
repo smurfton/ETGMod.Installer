@@ -71,7 +71,7 @@ namespace ETGModInstaller {
             }
 
             de4dot.OutputDataReceived += new DataReceivedEventHandler(
-                delegate (object sender, DataReceivedEventArgs e) {
+                delegate(object sender, DataReceivedEventArgs e) {
                     ins.LogLine(e.Data);
                 }
             );
