@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO.Compression;
 using System.Reflection;
 using System.Diagnostics;
+using System.Threading;
 
 namespace ETGModInstaller {
     public static class De4DotHelper {
@@ -61,6 +62,7 @@ namespace ETGModInstaller {
             de4dot.StartInfo.Arguments = "-f \"" + fileIn + "\" -o \"" + fileOut + "\"";
             de4dot.StartInfo.CreateNoWindow = true;
             de4dot.StartInfo.RedirectStandardOutput = true;
+            de4dot.StartInfo.RedirectStandardInput = true;
             de4dot.StartInfo.UseShellExecute = false;
             de4dot.EnableRaisingEvents = true;
 
@@ -75,9 +77,10 @@ namespace ETGModInstaller {
                     ins.LogLine(e.Data);
                 }
             );
-            //ins.Log(de4dot.StartInfo.FileName).Log(" ").LogLine(de4dot.StartInfo.Arguments);
+            ins.Log(de4dot.StartInfo.FileName).Log(" ").LogLine(de4dot.StartInfo.Arguments);
             de4dot.Start();
             de4dot.BeginOutputReadLine();
+            de4dot.StandardInput.WriteLine();
             de4dot.WaitForExit();
             de4dot.CancelOutputRead();
 
