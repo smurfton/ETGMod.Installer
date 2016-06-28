@@ -216,7 +216,7 @@ namespace ETGModInstaller {
                         ValidateNames = true,
                         Multiselect = true,
                         ShowReadOnly = false,
-                        Filter = "ETGMod ZIP|*.zip|ETGMod DLL|*.mm.dll|All files|*.*",
+                        Filter = "ETGMod DLL|*.mm.dll|ETGMod ZIP|*.zip|All files|*.*",
                         FilterIndex = 0
                     };
                     OpenModDialog.FileOk +=
@@ -326,6 +326,15 @@ namespace ETGModInstaller {
         public InstallerWindow Invoke(Action d) {
             base.Invoke(d);
             return this;
+        }
+        public void Wait(int sleep = 100) {
+            bool done = false;
+            Invoke(delegate () {
+                done = true;
+            });
+            while (!done) {
+                Thread.Sleep(sleep);
+            }
         }
         
         public InstallerWindow InitProgress(string str, int max) {
