@@ -39,7 +39,7 @@ namespace ETGModInstaller {
             Directory.SetCurrentDirectory(ins.MainMod.Dir.FullName);
             
             ins.LogLine("Entering the Modgeon");
-            
+
             //Clean the game from any previous installation
             ins.Uninstall();
 
@@ -167,7 +167,7 @@ namespace ETGModInstaller {
             ins.LogLine("then go to EtG_Data (that scary folder with many files),");
             ins.LogLine("upload output_log.txt somewhere and give it @0x0ade.");
             ins.LogLine("Good luck - Have fun!");
-            ins.ExeSelected(ins.MainMod.In.FullName, " [just installed]");
+            ins.ExeSelected(ExePath, " [just installed]");
             ins.SetMainEnabled(true);
         }
         
@@ -213,6 +213,9 @@ namespace ETGModInstaller {
                 return;
             }
 
+            // Uninstall can be invoked without the installer running
+            ins.Invoke(() => ExePath = ins.ExePathBox.Text).Wait();
+
             string pathGame = ins.MainMod.Dir.FullName;
             string pathBackup = Path.Combine(pathGame, "ModBackup");
             if (!Directory.Exists(pathBackup)) {
@@ -254,7 +257,6 @@ namespace ETGModInstaller {
                 string origPath = Path.Combine(pathGame, file);
                 File.Delete(origPath);
                 File.Move(files[i], origPath);
-                File.Delete(files[i]);
             }
 
             ins.LogLine("Reloading Assembly-CSharp.dll");
