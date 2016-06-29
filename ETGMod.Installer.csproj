@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="BinaryHelper.cs" />
     <Compile Include="De4DotHelper.cs" />
+    <Compile Include="ETGInstallerSettings.cs" />
     <Compile Include="lib-projs\MonoMod\MonoMod\MonoModOriginal.cs" />
     <Compile Include="lib-projs\MonoMod\MonoMod\MonoModOriginalName.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -234,5 +235,8 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assets\de4dot.zip" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
 </Project>

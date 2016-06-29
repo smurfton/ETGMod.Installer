@@ -17,9 +17,14 @@ namespace ETGModInstaller {
 
         public static string GetMainName() {
             string os = GetPlatform().ToString().ToLower();
-            return os.Contains("win") ? "EtG.exe" : "EtG.x86_64";
+            return os.Contains("win") ? "EtG.exe" : IntPtr.Size == 4 ? "EtG.x86" : "EtG.x86_64";
         }
-        
+
+        public static string GetProcessName() {
+            string os = GetPlatform().ToString().ToLower();
+            return os.Contains("win") ? "EtG" : IntPtr.Size == 4 ? "EtG.x86" : "EtG.x86_64";
+        }
+
         public static string GetSteamPath() {
             Process[] processes = Process.GetProcesses(".");
             string path = null;
@@ -123,8 +128,13 @@ namespace ETGModInstaller {
         }
         
         public static void ExeSelected(this InstallerWindow ins, string path, string suffix = null) {
+            if (string.IsNullOrWhiteSpace(path)) {
+                path = null;
+            }
+
+            string origPath = path;
             ins.Invoke(delegate() {
-                ins.ExeStatusLabel.Text = path == null ? ("No " + ETGFinder.GetMainName() + " selected") : "EtG [checking version]";
+                ins.ExeStatusLabel.Text = path == null ? ("No " + GetMainName() + " selected") : "EtG [checking version]";
                 if (path != null && suffix != null) {
                     ins.ExeStatusLabel.Text += suffix;
                 }
@@ -133,22 +143,25 @@ namespace ETGModInstaller {
                 ins.InstallButton.Enabled = false;
             });
 
-            if (ins.MainMod == null || ins.MainMod.In.FullName != path) {
-                if (path != null) {
-                    path = Path.Combine(Directory.GetParent(path).FullName, "EtG_Data", "Managed", "Assembly-CSharp.dll");
-                    if (!File.Exists(path)) {
-                        path = null;
-                    }
+            if (path != null && (ins.MainMod == null || ins.MainMod.In.FullName != path)) {
+                path = Path.Combine(Directory.GetParent(path).FullName, "EtG_Data", "Managed", "Assembly-CSharp.dll");
+                if (!File.Exists(path)) {
+                    path = null;
                 }
             }
 
-            if (path != null) {
-                ins.MainMod = new MonoMod.MonoMod(path);
-            } else {
+            ins.ModVersion = null;
+            if (path == null) {
                 ins.MainMod = null;
-                ins.ModVersion = null;
+                ins.Invoke(delegate () {
+                    ins.ExeStatusLabel.Text = "No " + GetMainName() + " selected";
+                    ins.ExeStatusLabel.BackColor = Color.FromArgb(127, 255, 63, 63);
+                    ins.ExePathBox.Text = origPath;
+                    ins.InstallButton.Enabled = false;
+                });
                 return;
             }
+            ins.MainMod = new MonoMod.MonoMod(path);
 
             //We want to read the assembly now already. Writing is also handled manually.
             try {
@@ -168,18 +181,15 @@ namespace ETGModInstaller {
                         break;
                     }
                 }
-                if (ModCctor == null) {
-                    ins.ExeSelected(null);
-                    return;
-                }
-                ins.ModVersion = null;
-                for (int i = 0; i < ModCctor.Body.Instructions.Count; i++) {
-                    if (!(ModCctor.Body.Instructions[i].Operand is FieldReference)) {
-                        continue;
-                    }
-                    if (((FieldReference) ModCctor.Body.Instructions[i].Operand).Name == "BaseVersionString") {
-                        ins.ModVersion = getString(ModCctor.Body.Instructions, i-1);
-                        break;
+                if (ModCctor != null) {
+                    for (int i = 0; i < ModCctor.Body.Instructions.Count; i++) {
+                        if (!(ModCctor.Body.Instructions[i].Operand is FieldReference)) {
+                            continue;
+                        }
+                        if (((FieldReference) ModCctor.Body.Instructions[i].Operand).Name == "BaseVersionString") {
+                            ins.ModVersion = getString(ModCctor.Body.Instructions, i - 1);
+                            break;
+                        }
                     }
                 }
             }
