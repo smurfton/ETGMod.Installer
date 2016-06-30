@@ -149,7 +149,7 @@ namespace ETGModInstaller {
             string origPath = path;
             ins.Invoke(delegate() {
                 ins.InstallButton.Enabled = false;
-                ins.ExePathBox.Text = path;
+                ins.ExePathBox.Text = origPath;
                 ins.ExeStatusLabel.Text = "EtG [checking version]";
                 if (suffix != null) {
                     ins.ExeStatusLabel.Text += suffix;
@@ -186,6 +186,10 @@ namespace ETGModInstaller {
                 return;
             } catch (Exception e) {
                 //Something went wrong.
+                ins.Log("Something went horribly wrong after you've selected ").LogLine(MainName);
+                ins.LogLine("Blame 0x0ade and send him this log ASAP!");
+                ins.Log("PATH: ").LogLine(path);
+                ins.Log("DIR: ").LogLine(ins.MainMod.Dir.FullName);
                 ins.LogLine(e.ToString());
                 ins.ExeSelected(null);
                 return;
@@ -226,7 +230,8 @@ namespace ETGModInstaller {
                 if (suffix != null) {
                     ins.ExeStatusLabel.Text += suffix;
                 }
-                
+
+                ins.ExePathBox.Text = origPath;
                 ins.InstallButton.Enabled = true;
                 ETGInstallerSettings.Save();
             });

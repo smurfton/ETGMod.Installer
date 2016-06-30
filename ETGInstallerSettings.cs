@@ -19,7 +19,11 @@ namespace ETGModInstaller {
                 } else if (os.Contains("mac") || os.Contains("osx")) {
                     return Path.Combine(Environment.GetEnvironmentVariable("HOME"), ".etgmodconfig.txt");
                 } else if (os.Contains("lin") || os.Contains("unix")) {
-                    return Path.Combine(Environment.GetEnvironmentVariable("XDG_CONFIG_HOME"), "", "etgmodconfig.txt");
+                    string xdg = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
+                    if (string.IsNullOrWhiteSpace(xdg)) {
+                        xdg = Path.Combine(Environment.GetEnvironmentVariable("HOME"), ".config");
+                    }
+                    return Path.Combine(xdg, "", "etgmodconfig.txt");
                 }
                 return Path.Combine(".", "etgmodconfig.txt");
             }

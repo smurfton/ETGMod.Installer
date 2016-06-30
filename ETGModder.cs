@@ -277,9 +277,12 @@ namespace ETGModInstaller {
             }
 
             string etgBackup = Path.Combine(pathBackup, ETGFinder.MainName);
+            ins.Log("Reverting: ").LogLine(ETGFinder.MainName);
             if (File.Exists(etgBackup)) {
                 File.Delete(ExePath);
                 File.Move(etgBackup, ExePath);
+            } else {
+                ins.Log("WARNING: Backup not found for ").LogLine(ETGFinder.MainName);
             }
 
             files = Directory.GetFiles(pathBackup);
@@ -637,6 +640,22 @@ namespace ETGModInstaller {
                 ));
             }
             return l;
+        }
+
+        public static string ToHexadecimalString(this byte[] data) {
+            return BitConverter.ToString(data).Replace("-", string.Empty);
+        }
+
+        public static bool ChecksumsEqual(this string[] a, string[] b) {
+            if (a.Length != b.Length) {
+                return false;
+            }
+            for (int i = 0; i < a.Length; i++) {
+                if (a[i].Trim() != b[i].Trim()) {
+                    return false;
+                }
+            }
+            return true;
         }
 
     }

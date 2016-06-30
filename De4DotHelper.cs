@@ -7,6 +7,7 @@ using System.IO.Compression;
 using System.Reflection;
 using System.Diagnostics;
 using System.Threading;
+using System.Security.Cryptography;
 
 namespace ETGModInstaller {
     public static class De4DotHelper {
@@ -46,12 +47,30 @@ namespace ETGModInstaller {
 
 
         public static void Deobfuscate(this InstallerWindow ins, string file) {
-            ins.Log("Deobfuscating ").Log(file).LogLine(" with de4dot");
+            string fileIn = Path.Combine(ins.MainMod.Dir.FullName, file);
+            string fileOut = fileIn + ".deobfuscated";
+
+            string cachedPath = Path.Combine(ins.MainMod.Dir.FullName, "ModCache", file + ".deobfuscated");
+            string cachedPathHash = cachedPath + ".sum";
+
+            string hash;
+            using (MD5 md5 = MD5.Create()) {
+                using (FileStream fs = File.OpenRead(fileIn)) {
+                    hash = md5.ComputeHash(fs).ToHexadecimalString();
+                }
+            }
+
+            if (File.Exists(cachedPath) && File.Exists(cachedPathHash) &&
+                File.ReadAllText(cachedPathHash) == hash) {
+                ins.Log("Assembly ").Log(file).LogLine(" already deobfuscated in cache.");
+                File.Copy(cachedPath, fileIn, true);
+                return;
+            }
+
+            ins.Log("Deobfuscating ").Log(file).LogLine(" with de4dot.");
             ins.InitProgress("Deobfuscating...", 1);
 
             string de4dotPath = Path.Combine(ins.MainMod.Dir.FullName, "de4dot" + (IntPtr.Size == 4 ? ".exe" : "-x64.exe"));
-            string fileIn = Path.Combine(ins.MainMod.Dir.FullName, file);
-            string fileOut = fileIn + ".deobfuscated";
 
             if (File.Exists(fileOut)) {
                 File.Delete(fileOut);
@@ -86,6 +105,8 @@ namespace ETGModInstaller {
 
             File.Delete(fileIn);
             File.Move(fileOut, fileIn);
+            File.Copy(fileIn, cachedPath, true);
+            File.WriteAllText(cachedPathHash, hash);
             ins.EndProgress("Deobfuscated.");
         }
 

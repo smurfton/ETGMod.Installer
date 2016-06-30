@@ -185,7 +185,7 @@ namespace ETGModInstaller {
             UninstallButton.Click += (object senderClick, EventArgs eClick) => Task.Run(delegate() {
                 this.Uninstall();
                 this.ClearCache();
-                this.ExeSelected(MainMod.In.FullName, " [just uninstalled]");
+                this.ExeSelected(ExePathBox.Text, " [just uninstalled]");
                 this.SetMainEnabled(true);
             });
             
@@ -436,7 +436,7 @@ namespace ETGModInstaller {
             ETGInstallerSettings.Load();
             ETGInstallerSettings.Save();
 
-            if (string.IsNullOrEmpty(ExePathBox.Text)) {
+            if (string.IsNullOrWhiteSpace(ExePathBox.Text)) {
                 Task.Run((Action) ETGFinder.FindETG);
             }
             Task.Run((Action) DownloadModsList);
