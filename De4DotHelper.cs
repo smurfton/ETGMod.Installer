@@ -47,6 +47,10 @@ namespace ETGModInstaller {
 
 
         public static void Deobfuscate(this InstallerWindow ins, string file) {
+            if (!Directory.Exists(Path.Combine(ins.MainMod.Dir.FullName, "ModCache"))) {
+                Directory.CreateDirectory(Path.Combine(ins.MainMod.Dir.FullName, "ModCache"));
+            }
+
             string fileIn = Path.Combine(ins.MainMod.Dir.FullName, file);
             string fileOut = fileIn + ".deobfuscated";
 
