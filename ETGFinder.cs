@@ -126,21 +126,29 @@ namespace ETGModInstaller {
                 InstallerWindow.Instance.ExeSelected(null);
             }
         }
-        
+
+        public static void ExeLoaded(this InstallerWindow ins, string path) {
+            ins.ExePathBox.Text = path;
+            Task.Run(delegate () {
+                ins.ExeSelected(path, " [saved]");
+            });
+        }
+
+
         public static void ExeSelected(this InstallerWindow ins, string path, string suffix = null) {
-            if (string.IsNullOrWhiteSpace(path)) {
+            if (string.IsNullOrEmpty(path)) {
                 path = null;
             }
 
             string origPath = path;
             ins.Invoke(delegate() {
-                ins.ExeStatusLabel.Text = path == null ? ("No " + GetMainName() + " selected") : "EtG [checking version]";
-                if (path != null && suffix != null) {
+                ins.InstallButton.Enabled = false;
+                ins.ExePathBox.Text = path;
+                ins.ExeStatusLabel.Text = "EtG [checking version]";
+                if (suffix != null) {
                     ins.ExeStatusLabel.Text += suffix;
                 }
-                ins.ExeStatusLabel.BackColor = path == null ? Color.FromArgb(127, 255, 63, 63) : Color.FromArgb(127, 255, 255, 63);
-                ins.ExePathBox.Text = path ?? "";
-                ins.InstallButton.Enabled = false;
+                ins.ExeStatusLabel.BackColor = Color.FromArgb(127, 255, 255, 63);
             });
 
             if (path != null && (ins.MainMod == null || ins.MainMod.In.FullName != path)) {
@@ -156,7 +164,7 @@ namespace ETGModInstaller {
                 ins.Invoke(delegate () {
                     ins.ExeStatusLabel.Text = "No " + GetMainName() + " selected";
                     ins.ExeStatusLabel.BackColor = Color.FromArgb(127, 255, 63, 63);
-                    ins.ExePathBox.Text = origPath;
+                    ins.ExePathBox.Text = "";
                     ins.InstallButton.Enabled = false;
                 });
                 return;
@@ -168,6 +176,11 @@ namespace ETGModInstaller {
                 ins.MainMod.Read(true);
             } catch (BadImageFormatException) {
                 //this is not the assembly we need...
+                ins.ExeSelected(null);
+                return;
+            } catch (Exception e) {
+                //Something went wrong.
+                ins.LogLine(e.ToString());
                 ins.ExeSelected(null);
                 return;
             }
@@ -209,6 +222,7 @@ namespace ETGModInstaller {
                 }
                 
                 ins.InstallButton.Enabled = true;
+                ETGInstallerSettings.Save();
             });
         }
         

@@ -28,8 +28,8 @@ namespace ETGModInstaller {
         public static Dictionary<string, Func<string>> OnSave = new Dictionary<string, Func<string>>();
 
         static ETGInstallerSettings() {
-            OnLoad["exe"] = (s) => InstallerWindow.Instance.ExeSelected(s, " [saved]");
-            OnSave["exe"] = () => InstallerWindow.Instance.ExePathButton.Text;
+            OnLoad["exe"] = (s) => InstallerWindow.Instance.ExeLoaded(s);
+            OnSave["exe"] = () => InstallerWindow.Instance.ExePathBox.Text;
 
             OnLoad["autorun"] = (s) => InstallerWindow.Instance.AdvancedAutoRunCheckbox.Checked = bool.Parse(s);
             OnSave["autorun"] = () => InstallerWindow.Instance.AdvancedAutoRunCheckbox.Checked.ToString();

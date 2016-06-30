@@ -214,7 +214,7 @@ namespace ETGModInstaller {
                 TextAlign = ContentAlignment.MiddleCenter
             });
             AdvancedPanel.Controls.Add(AdvancedAutoRunCheckbox = new CheckBox() {
-                Text = "FORCE-EXIT " + ETGFinder.GetMainName() + " and then run when install finished",
+                Text = "FORCE-EXIT " + ETGFinder.GetMainName() + " and run when ETGMod installed",
                 TextAlign = ContentAlignment.MiddleCenter
             });
             AdvancedAddButton.Click += delegate(object senderClick, EventArgs eClick) {
@@ -436,7 +436,7 @@ namespace ETGModInstaller {
             ETGInstallerSettings.Load();
             ETGInstallerSettings.Save();
 
-            if (string.IsNullOrWhiteSpace(ExePathBox.Text)) {
+            if (string.IsNullOrEmpty(ExePathBox.Text)) {
                 Task.Run((Action) ETGFinder.FindETG);
             }
             Task.Run((Action) DownloadModsList);
