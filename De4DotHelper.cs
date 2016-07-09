@@ -89,8 +89,7 @@ namespace ETGModInstaller {
             de4dot.StartInfo.UseShellExecute = false;
             de4dot.EnableRaisingEvents = true;
 
-            string os = ETGFinder.GetPlatform().ToString().ToLower();
-            if (!os.Contains("win")) {
+            if (ETGFinder.Platform.HasFlag(ETGPlatform.Unix)) {
                 de4dot.StartInfo.Arguments = "\"" + de4dot.StartInfo.FileName + "\" " + de4dot.StartInfo.Arguments;
                 de4dot.StartInfo.FileName = "mono";
             }
