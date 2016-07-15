@@ -449,6 +449,10 @@ namespace ETGModInstaller {
                 return this;
             }
 
+            if (IsDisposed) {
+                return this;
+            }
+
             base.Invoke(d);
             return this;
         }
