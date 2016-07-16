@@ -78,6 +78,7 @@ namespace ETGModInstaller {
             ins.Uninstall();
 
             ins.Backup("UnityEngine.dll");
+            ins.Backup("UnityEngine.dll.mdb");
             ins.Backup("Assembly-CSharp.dll");
             ins.BackupETG();
 
@@ -525,6 +526,10 @@ namespace ETGModInstaller {
                                     ins.LogLine("There's a new ETGMod Installer version!");
                                     ins.LogLine("Visit https://0x0ade.github.io/etgmod/#download to download it.");
                                     ins.Log("(Minimum installer version for this ETGMod version: ").LogLine(minv.ToString()).Log(")");
+                                    ins.Invoke(() => ins.Progress.BrushProgress =
+                                        new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(255, 63, 63, 91))
+                                    );
+                                    ins.InitProgress("Installer update required!", 1).SetProgress(1);
                                     return false;
                                 }
                             }
@@ -622,6 +627,8 @@ namespace ETGModInstaller {
                 using (StreamWriter streamWriter = new StreamWriter(fileStream)) {
                     monomod.Logger = (string s) => ins.OnActivity();
                     monomod.Logger += (string s) => streamWriter.WriteLine(s);
+                    // Unity wants .mdbs
+                    monomod.WriterParameters.SymbolWriterProvider = new Mono.Cecil.Mdb.MdbWriterProvider();
                     try {
                         monomod.AutoPatch(true, true);
                         return true;
@@ -644,6 +651,8 @@ namespace ETGModInstaller {
                 using (StreamWriter streamWriter = new StreamWriter(fileStream)) {
                     ins.MainMod.Logger = (string s) => ins.OnActivity();
                     ins.MainMod.Logger += (string s) => streamWriter.WriteLine(s);
+                    // Unity wants .mdbs
+                    ins.MainMod.WriterParameters.SymbolWriterProvider = new Mono.Cecil.Mdb.MdbWriterProvider();
                     try {
                         ins.MainMod.AutoPatch(true, true);
                         return true;
